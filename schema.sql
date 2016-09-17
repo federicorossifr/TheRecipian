@@ -1,0 +1,124 @@
+DROP DATABASE IF EXISTS recipian;
+CREATE DATABASE recipian;
+USE recipian;
+
+CREATE TABLE pics(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    path VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    passkey VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
+    pic INTEGER,
+    FOREIGN KEY (pic) REFERENCES pics(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+);
+
+CREATE TABLE userFollow (
+    follower INTEGER NOT NULL,
+    followed INTEGER NOT NULL,
+    FOREIGN KEY(follower) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(follower) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE recipes (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    description LONGTEXT NOT NULL,
+    difficulty INTEGER NOT NULL,
+    user INTEGER NOT NULL,
+    posted DATETIME,
+    FOREIGN KEY (user) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE recipePic (
+    pic INTEGER NOT NULL,
+    recipe INTEGER NOT NULL,
+    PRIMARY KEY (pic,recipe),
+    FOREIGN KEY (pic) REFERENCES pics(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (recipe) REFERENCES recipes(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE recipeComments (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    recipe INTEGER NOT NULL,
+    comment LONGTEXT NOT NULL,
+    user INTEGER NOT NULL,
+    FOREIGN KEY(recipe) REFERENCES recipes(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(user) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE recipeVotes(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user INTEGER NOT NULL,
+    recipe INTEGER NOT NULL,
+    vote INTEGER NOT NULL,
+    FOREIGN KEY(user) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(recipe) REFERENCES recipes(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE recipeCategories (
+    recipe INTEGER NOT NULL,
+    category INTEGER NOT NULL,
+    PRIMARY KEY (recipe,category),
+    FOREIGN KEY(recipe) REFERENCES recipes(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE recipeRecipients (
+    id  INTEGER PRIMARY KEY AUTO_INCREMENT,
+    recipe INTEGER NOT NULL,
+    recipient INTEGER NOT NULL,
+    dosing DOUBLE NOT NULL,
+    unit VARCHAR(255) NOT NULL,
+    FOREIGN KEY(recipe) REFERENCES recipes(id) 
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE recipeCategories
+ADD CONSTRAINT
+FOREIGN KEY(category) REFERENCES categories(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
+
+CREATE TABLE recipients (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE recipeRecipients
+ADD CONSTRAINT
+FOREIGN KEY(recipient) REFERENCES recipients(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
