@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
+    public $timestamps = false;
     public function recipes() {
         return $this->hasMany("App\Recipe","user");
     }
